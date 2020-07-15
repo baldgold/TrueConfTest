@@ -3,20 +3,34 @@ import wx.lib.imagebrowser as imagebrowser
 import wx
 
 
-if __name__ == "__main__":
-
+def main_window():
     app = wx.App(False)
     dialog = imagebrowser.ImageDialog(None)
     if dialog.ShowModal() == wx.ID_OK:
         image_address = dialog.GetFile()
         print("Вы выбрали файл: " + image_address)
+        if not scale_image_2x(image_address):
+            wx.MessageBox('Вы выбрали НЕ изображение\nПопробуйте ещё раз.', 'Проблема с изображением',
+                          wx.OK | wx.ICON_WARNING)
+            print('Изображение не найдено!')
+        else:
+            print('Дело сделано!')
     dialog.Destroy()
+
+
+def scale_image_2x(image_address):
+    """scale_image_2x( image_address ):
+
+    Параметры:
+        image_address - строка(str), которая содержит адрес изображения
+
+    Эта функция увеличивает размер изображения в 2 раза и сохраняет новое изображение в папку, где находится
+    исходный файл. Возвращает True, если все процессы прошли успешно. В противном случае возвращает False."""
 
     src = cv2.imread(image_address, cv2.IMREAD_UNCHANGED)
 
     if src is None:
-        wx.MessageBox('Вы выбрали НЕ изображение\nПопробуйте ещё раз.', 'Проблема с изображением', wx.OK | wx.ICON_WARNING)
-        print('Изображение не найдено!')
+        return False
     else:
         # процент, на который измениться размер изображения
         scale_percent = 200
@@ -32,4 +46,8 @@ if __name__ == "__main__":
 
         # записываем вывод cv2.resize в локальный файл изображения
         cv2.imwrite('new_image_x2.png', output)
-        print('Дело сделано!')
+    return True
+
+
+if __name__ == "__main__":
+    main_window()
